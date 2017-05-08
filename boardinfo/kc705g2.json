@@ -204,6 +204,154 @@
 			"PIO_DIRECTION": "OUTPUT"
 		}
     },
+    "ethernet" : {
+        "mdio": {
+          "PACKAGE_PIN":"J21",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "BIDIR"
+        },
+        "mdc": {
+          "PACKAGE_PIN": "R23",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "int_b": {
+          "PACKAGE_PIN": "N30",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "reset_b": {
+          "PACKAGE_PIN": "L20", 
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "OUTPUT" 
+        },
+        "crs": {
+          "PACKAGE_PIN": "R30", 
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "col": {
+          "PACKAGE_PIN": "W19", 
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxclk": {
+          "PACKAGE_PIN": "U27",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxer": {
+          "PACKAGE_PIN": "V26",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "rxdv": {
+          "PACKAGE_PIN": "R28",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd0": {
+          "PACKAGE_PIN": "U30",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        }, 
+        "rxd1": {
+          "PACKAGE_PIN": "U25",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd2": {
+          "PACKAGE_PIN": "T25",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd3": {
+          "PACKAGE_PIN": "U28",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd4": {
+          "PACKAGE_PIN": "R19",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd5": {
+          "PACKAGE_PIN": "T27",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd6": {
+          "PACKAGE_PIN": "T26",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "INPUT"
+        },
+        "rxd7": {
+          "PACKAGE_PIN": "T28",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "INPUT"
+        },
+        "gtxclk": {
+          "PACKAGE_PIN": "K30", 
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        }, 
+        "txclk": {
+          "PACKAGE_PIN": "M28",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        }, 
+        "txer": {
+          "PACKAGE_PIN":"N29",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "INPUT"
+        }, 
+        "txen": {
+          "PACKAGE_PIN": "M27",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "txd0": {
+          "PACKAGE_PIN": "N27",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        }, 
+        "txd1": {
+          "PACKAGE_PIN": "N25",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        }, 
+        "txd2": {
+          "PACKAGE_PIN": "M29",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        }, 
+        "txd3": {
+          "PACKAGE_PIN": "L28",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "txd4": {
+          "PACKAGE_PIN": "J26",
+          "IOSTANDARD": "LVCMOS25",
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "txd5": {
+          "PACKAGE_PIN": "K26",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "OUTPUT"
+        }, 
+        "txd6": {
+          "PACKAGE_PIN": "L30",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "OUTPUT"
+        },
+        "txd7": {
+          "PACKAGE_PIN": "J28",
+          "IOSTANDARD": "LVCMOS25", 
+          "PIO_DIRECTION": "OUTPUT"
+        }
+
+    }, 
     "sdio": {
         "dat0": {
             "PACKAGE_PIN": "AC20",
