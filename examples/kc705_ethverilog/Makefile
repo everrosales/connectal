@@ -10,8 +10,8 @@ MEM_READ_INTERFACES =
 MEM_WRITE_INTERFACES =
 
 PINOUT_FILE += $(PROJDIR)/pin_translation.json
-PIN_TYPE = EthMasterPins
-PIN_TYPE_INCLUDE = Eth
+PIN_TYPE = AxiethlitePhy
+PIN_TYPE_INCLUDE = AxiEthLite
 AUTOTOP = --interface pins:EthTest.ethMasterPins
 
 include $(CONNECTALDIR)/Makefile.connectal

@@ -3,16 +3,18 @@ import Eth::*;
 import MemTypes::*;
 import AxiBits::*;
 import AxiDma::*;
+import AxiEthLite::*;
 
 //import EthBvi::*;
 
 interface EthTest;
-  interface EthMasterPins ethMasterPins;
+  interface AxiethlitePhy ethMasterPins;
+  interface EthRequest ethRequest;
 endinterface
 
 interface EthRequest;
   method Action reset();
-  method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32)data);
+  method Action request(Bit#(8) wen, Bit#(32) addr, Bit#(32)data);
 endinterface
 
 interface EthIndication;
@@ -42,5 +44,5 @@ module mkEthTest#(EthIndication ethIndication) (EthTest);
   endinterface
 
 
-  interface EthMasterPins ethMasterPins = eth.pins;
+  interface AxiethlitePhy ethMasterPins = eth.pins;
 endmodule
