@@ -65,7 +65,7 @@ interface AxiEthLite;
     interface AxiethliteS_axi     s_axi;
 endinterface
 import "BVI" ethernetlite =
-module mkAxiEthLite (AxiEthLite);
+module mkAxiEthLite(AxiEthLite);
     default_clock s_axi_aclk();
     default_reset s_axi_aresetn();
         //input_clock s_axi_aclk(s_axi_aclk) = s_axi_aclk;
@@ -81,7 +81,7 @@ module mkAxiEthLite (AxiEthLite);
         method col(phy_col) enable((*inhigh*) EN_phy_col);
         method crs(phy_crs) enable((*inhigh*) EN_phy_crs);
         method dv(phy_dv) enable((*inhigh*) EN_phy_dv);
-        method phy_rst_n rst_n();
+        method phy_rst_n rst_n() ;
         method rx_clk(phy_rx_clk) enable((*inhigh*) EN_phy_rx_clk);
         method rx_data(phy_rx_data) enable((*inhigh*) EN_phy_rx_data);
         method rx_er(phy_rx_er) enable((*inhigh*) EN_phy_rx_er);

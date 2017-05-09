@@ -8,7 +8,7 @@ import AxiEthLite::*;
 //import EthBvi::*;
 
 interface EthTest;
-  interface AxiethlitePhy ethMasterPins;
+  interface EthMasterPins ethMasterPins;
   interface EthRequest ethRequest;
 endinterface
 
@@ -44,5 +44,5 @@ module mkEthTest#(EthIndication ethIndication) (EthTest);
   endinterface
 
 
-  interface AxiethlitePhy ethMasterPins = eth.pins;
+  interface EthMasterPins ethMasterPins = eth.pins;
 endmodule

@@ -6,9 +6,15 @@ import FIFO::*;
 import AxiEthLite::*;
 
 
+interface EthMasterPins;
+  (* prefix = "" *)
+  interface AxiethlitePhy pins;
+  interface Clock deleteme_unused_clock;
+endinterface
+
 interface EthMaster;
   (* prefix ="" *)
-  interface AxiethlitePhy pins;
+  interface EthMasterPins pins;
 
   method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data);
   method Action deq();
@@ -18,6 +24,7 @@ endinterface
 
 
 module mkEthMaster(EthMaster);
+  let clock <- exposeCurrentClock();
   AxiEthLite ethLite <- mkAxiEthLite;
 
   // Make a dwire that does a thing
@@ -102,5 +109,8 @@ module mkEthMaster(EthMaster);
     end
   endmethod  
   
-  interface AxiethlitePhy pins = ethLite.phy;
+  interface EthMasterPins pins;
+    interface AxiethlitePhy pins = ethLite.phy;
+    interface Clock deleteme_unused_clock = clock;
+  endinterface
 endmodule
