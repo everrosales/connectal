@@ -1,0 +1,66 @@
+{
+    "pins_tx_clk": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet":"txclk"
+    }, 
+    "pins_rx_clk": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet":"rxclk"
+    },
+    "pins_rx_data_0":{
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxd0"
+    },
+    "pins_rx_data_1": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxd1"
+    },
+    "pins_rx_data_2": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxd2"
+    },
+    "pins_rx_data_3": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxd3"
+    },
+    "pins_tx_data_0": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "txd0"
+    },
+    "pins_tx_data_1": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "txd1"
+    },
+    "pins_tx_data_2": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "txd2"
+    },
+    "pins_tx_data_3": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "txd3"
+    },
+    "pins_dv": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxdv"
+    },
+    "pins_rx_er": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "rxer"
+    },
+    "pins_tx_en": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "txen"
+    },
+    "pins_crs": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "crs"
+    },
+    "pins_col": {
+        "PIO_DIRECTION": "INPUT",
+        "ethernet": "col"
+    },
+    "pins_rst_n": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "reset_b"
+    }
+}
