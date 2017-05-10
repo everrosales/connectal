@@ -7,13 +7,13 @@ import AxiEthLite::*;
 
 
 interface EthMasterPins;
-  (* prefix = "" *)
+  (* prefix = "phy" *)
   interface AxiethlitePhy pins;
   interface Clock deleteme_unused_clock;
+  
 endinterface
 
 interface EthMaster;
-  (* prefix ="" *)
   interface EthMasterPins pins;
 
   method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data);
@@ -27,6 +27,8 @@ module mkEthMaster(EthMaster);
   let clock <- exposeCurrentClock();
   AxiEthLite ethLite <- mkAxiEthLite;
 
+  Reg#(Bit#(1)) intc <- mkReg(0);
+
   // Make a dwire that does a thing
   Wire#(Bit#(13)) araddr <- mkDWire(0);
   Wire#(Bit#(1)) arvalid <- mkDWire(0);
@@ -37,7 +39,6 @@ module mkEthMaster(EthMaster);
   Wire#(Bit#(32)) wdata  <- mkDWire(0);
   Wire#(Bit#(4)) wstrb   <- mkDWire(0);
   Wire#(Bit#(1)) wvalid  <- mkDWire(0);
-  
   // Add book keeping fifo
   // Check if the read
   FIFO#(Bool) bookkeeperWasWrite <- mkFIFO;
@@ -53,6 +54,10 @@ module mkEthMaster(EthMaster);
     ethLite.s_axi.wdata(wdata);
     ethLite.s_axi.wstrb(wstrb);
     ethLite.s_axi.wvalid(wvalid);
+  endrule
+
+  rule readInt;
+    intc <= ethLite.ip2.intp;
   endrule
 
   method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data) if (ethLite.s_axi.awready == 1 && ethLite.s_axi.arready == 1);

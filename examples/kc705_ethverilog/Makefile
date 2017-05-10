@@ -14,4 +14,7 @@ PIN_TYPE = EthMasterPins
 PIN_TYPE_INCLUDE = Eth
 AUTOTOP = --interface pins:EthTest.ethMasterPins
 
+
+CONNECTALFLAGS += --xci=$(IPDIR)/$(BOARD)/ethernetlite/ethernetlite.xci
+
 include $(CONNECTALDIR)/Makefile.connectal
