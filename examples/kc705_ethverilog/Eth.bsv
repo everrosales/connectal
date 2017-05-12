@@ -61,6 +61,8 @@ module mkEthMaster(EthMaster);
   endrule
 
   method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data) if (ethLite.s_axi.awready == 1 && ethLite.s_axi.arready == 1);
+    $display("Eth: Beginning request\n");
+
     if (wen != 0) begin
       let mask = 32'b0;
       if (wen[3] != 0) begin
@@ -81,6 +83,7 @@ module mkEthMaster(EthMaster);
       wdata <= data & mask;
       awvalid <= 1'b1;
       //ethLite.s_axi.awready(1'b1);
+      $display("enqueuing bookkeeper\n");
       bookkeeperWasWrite.enq(True);
     end else begin
       araddr <= truncate(addr);
@@ -88,7 +91,7 @@ module mkEthMaster(EthMaster);
       bookkeeperWasWrite.enq(False);
     end
   endmethod
-  
+ 
   method Action deq if (ethLite.s_axi.bvalid == 1 && ethLite.s_axi.rvalid == 1);
     if (ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first()) begin
       // This was a write 

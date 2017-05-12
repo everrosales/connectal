@@ -10,7 +10,7 @@ class EthIndication;
    public:
      Eth();
 //     ~Eth();
-//     // void reset();
+     void reset();
      void read(unsigned long offset, uint8_t *buf);
      void write(unsigned long offset, const uint8_t *buf);
 //

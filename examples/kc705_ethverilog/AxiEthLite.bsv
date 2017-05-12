@@ -66,8 +66,8 @@ interface AxiEthLite;
 endinterface
 import "BVI" ethernetlite =
 module mkAxiEthLite (AxiEthLite);
-    default_clock s_axi_aclk();
-    default_reset s_axi_aresetn();
+    default_clock s_axi_aclk(s_axi_aclk);
+    default_reset s_axi_aresetn(s_axi_aresetn);
         //input_clock s_axi_aclk(s_axi_aclk) = s_axi_aclk;
         //input_clock (phy_rx_clk) = phy_rx_clk;
         //input_clock (phy_tx_clk) = phy_tx_clk; 
@@ -108,7 +108,7 @@ module mkAxiEthLite (AxiEthLite);
         method wstrb(s_axi_wstrb) clocked_by (s_axi_aclk) enable((*inhigh*) EN_s_axi_wstrb);
         method wvalid(s_axi_wvalid) clocked_by (s_axi_aclk) enable((*inhigh*) EN_s_axi_wvalid);
     endinterface
-    schedule (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_data, phy.rx_er, phy.rx_clk, phy.tx_clk, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid) CF (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_clk, phy.tx_clk, phy.rx_data, phy.rx_er, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid);
+    schedule (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_data, phy.rx_er, phy.rx_clk, phy.tx_clk, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp) CF (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_clk, phy.tx_clk, phy.rx_data, phy.rx_er, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp);
 endmodule
 
 /*
