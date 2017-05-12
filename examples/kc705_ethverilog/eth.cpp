@@ -75,6 +75,11 @@ class EthIndication: public EthIndicationWrapper {
      write(AXIETH_TCTL, ctl);
    }
 
+   void axi_eth_init() {
+   
+   }
+
+
    void sendPacket(tx_packet *pkt, int len) {
       // Basic strategy to write a packet
       // 1) Write destination mac [0 - 5]     len: 6
