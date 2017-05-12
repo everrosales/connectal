@@ -45,6 +45,7 @@ module mkEthMaster(EthMaster);
 
   (* no_implicit_conditions *)
   rule readPins;
+    $display("reading pins\n");
     ethLite.s_axi.araddr(araddr);
     ethLite.s_axi.arvalid(arvalid);
     ethLite.s_axi.awaddr(awaddr);
@@ -60,44 +61,34 @@ module mkEthMaster(EthMaster);
     intc <= ethLite.ip2.intp;
   endrule
 
-  method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data) if (ethLite.s_axi.awready == 1 && ethLite.s_axi.arready == 1);
+  method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data) if (ethLite.s_axi.wready == 1 && ethLite.s_axi.arready == 1 && ethLite.s_axi.awready == 1);
     $display("Eth: Beginning request\n");
 
     if (wen != 0) begin
-      let mask = 32'b0;
-      if (wen[3] != 0) begin
-        mask[31:24] = 8'b11111111;
-      end
-      if (wen[2] != 0) begin
-        mask[23:16] = 8'b11111111;
-      end
-      if (wen[1] != 0) begin
-        mask[15:8] = 8'b11111111;
-      end
-      if (wen[0] != 0) begin
-        mask[7:0]  = 8'b11111111;
-      end
       // If this is a write make sure you use waddr
       // Write address to wraddr
       awaddr <= truncate(addr);
-      wdata <= data & mask;
+      wstrb <= wen;
+      wdata <= data;
       awvalid <= 1'b1;
+      wvalid <= 1'b1;
       //ethLite.s_axi.awready(1'b1);
       $display("enqueuing bookkeeper\n");
       bookkeeperWasWrite.enq(True);
     end else begin
       araddr <= truncate(addr);
       arvalid <= 1'b1;
+      wstrb <= wen;
       bookkeeperWasWrite.enq(False);
     end
   endmethod
  
-  method Action deq if (ethLite.s_axi.bvalid == 1 && ethLite.s_axi.rvalid == 1);
-    if (ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first()) begin
+  method Action deq if ((ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first) || (ethLite.s_axi.rvalid == 1 && !bookkeeperWasWrite.first));
+    if (ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first) begin
       // This was a write 
       bready <= 1'b0;
       bookkeeperWasWrite.deq;
-    end else if (ethLite.s_axi.rvalid == 1 && !bookkeeperWasWrite.first()) begin
+    end else if (ethLite.s_axi.rvalid == 1 && !bookkeeperWasWrite.first) begin
       // This was a read
       rready <= 1'b0;
       bookkeeperWasWrite.deq;
@@ -107,7 +98,7 @@ module mkEthMaster(EthMaster);
     end
   endmethod
 
-  method Tuple2#(Bool, Bit#(32)) first() if (ethLite.s_axi.bvalid == 1 && ethLite.s_axi.rvalid == 1);
+  method Tuple2#(Bool, Bit#(32)) first() if ((ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first) || (ethLite.s_axi.rvalid == 1 && !bookkeeperWasWrite.first));
     if (ethLite.s_axi.bvalid == 1 && bookkeeperWasWrite.first()) begin
       return tuple2(True, {30'b0, ethLite.s_axi.bresp}); 
     end else if (ethLite.s_axi.rvalid == 1 && !bookkeeperWasWrite.first()) begin
