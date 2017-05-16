@@ -102,7 +102,7 @@ module mkEthMaster(EthMaster);
     awvalid <= pending_awvalid;
   endrule
 
-  rule deqWriteAddr if (ethLite.s_axi.awready == 1);
+  rule deqWriteAddr (ethLite.s_axi.awready == 1);
     wachan.deq;
   endrule
 
@@ -117,11 +117,11 @@ module mkEthMaster(EthMaster);
 
   endrule
 
-  rule deqWriteData if (ethLite.s_axi.wready == 1);
+  rule deqWriteData (ethLite.s_axi.wready == 1);
     wdchan.deq;
   endrule
 
-  rule doWriteResp if (ethLite.s_axi.bvalid == 1);
+  rule doWriteResp (ethLite.s_axi.bvalid == 1);
      wrchan.enq(WriteResponseChan{bresp: ethLite.s_axi.bresp});
     // let pending_bresp = wrchan.first.bresp;
     // let pending_bvalid = wrchan.first.bvalid;
@@ -130,7 +130,7 @@ module mkEthMaster(EthMaster);
     // bvalid <= pending_bvalid;
   endrule
 
-  rule deqWriteResp if (wrchan.notFull);
+  rule deqWriteResp (wrchan.notFull);
     bready <= 1'b1;  
   endrule
      
@@ -142,11 +142,11 @@ module mkEthMaster(EthMaster);
     arvalid <= pending_arvalid;
   endrule
 
-  rule deqReadAddr if (ethLite.s_axi.arready == 1);
+  rule deqReadAddr (ethLite.s_axi.arready == 1);
     rachan.deq;
   endrule
 
-  rule doReadData if (ethLite.s_axi.rvalid == 1);
+  rule doReadData (ethLite.s_axi.rvalid == 1);
     rdchan.enq(ReadDataChan{rdata: ethLite.s_axi.rdata, rvalid: ethLite.s_axi.rvalid});
     //  let pending_rdata = rdchan.first.rdata;
     //  let pending_rvalid = rdchan.first.rvalid;
@@ -154,14 +154,12 @@ module mkEthMaster(EthMaster);
     //  rvalid <= pending_rvalid;
   endrule
 
-  rule deqReadData if (rdchan.notFull);
+  rule deqReadData (rdchan.notFull);
     rready <= 1'b1; 
   endrule
 
 
   method Action request(Bit#(4) wen, Bit#(32) addr, Bit#(32) data);
-    $display("Eth: Beginning request\n");
-
     if (wen != 0) begin
       // If this is a write make sure you use waddr
       // Write address to wraddr
@@ -179,12 +177,12 @@ module mkEthMaster(EthMaster);
   method Action deq;
     if (bookkeeperWasWrite.first) begin
       // This was a write 
-      bready <= 1'b1;
+      //bready <= 1'b1;
       wrchan.deq;
       bookkeeperWasWrite.deq;
     end else if (!bookkeeperWasWrite.first) begin
       // This was a read
-      rready <= 1'b1;
+      //rready <= 1'b1;
       rdchan.deq;
       bookkeeperWasWrite.deq;
     end else begin
@@ -193,13 +191,11 @@ module mkEthMaster(EthMaster);
     end
   endmethod
 
-  method Tuple2#(Bool, Bit#(32)) first();
+  method Tuple2#(Bool, Bit#(32)) first if (bookkeeperWasWrite.first || !bookkeeperWasWrite.first);
     if (bookkeeperWasWrite.first()) begin
       return tuple2(True, {30'b0, wrchan.first.bresp}); 
-    end else if (!bookkeeperWasWrite.first()) begin
-      return tuple2(True, rdchan.first.rdata);
     end else begin
-      return tuple2(False, 32'b0);
+      return tuple2(False, rdchan.first.rdata);
     end
   endmethod  
   
