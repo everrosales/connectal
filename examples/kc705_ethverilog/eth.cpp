@@ -90,24 +90,24 @@ class EthIndication: public EthIndicationWrapper {
 
      printf("Disabling 1000BASE_T\n");
      //  Dont advertise 1000BASE_T Full/Half duplex speeds
-     if (axi_eth_mdio_write(3, MII_CTRL1000, 0) < 0) {
+     if (axi_eth_mdio_write(7, MII_CTRL1000, 0) < 0) {
        printf("Failed writing miictrl100\n");
      }
 
      printf("Advertising 10/100\n");
      //  Advertise only 10 and 100mbps full/half duplex speeds
-     if (axi_eth_mdio_write(3, MII_ADVERTISE, ADVERTISE_ALL | ADVERTISE_CSMA) < 0) {
+     if (axi_eth_mdio_write(7, MII_ADVERTISE, ADVERTISE_ALL | ADVERTISE_CSMA) < 0) {
        printf("Failed to advertise\n");
      }
   
      printf("Restarting auto negotiation\n");
 
      // Restart auto negotiation
-     uint32_t bmcr = axi_eth_mdio_read(3, MII_BMCR);
+     uint32_t bmcr = axi_eth_mdio_read(7, MII_BMCR);
      printf("bmcr: %x\n", bmcr);
      bmcr |= (BMCR_ANENABLE | BMCR_ANRESTART);
-     axi_eth_mdio_write(3, MII_BMCR, 0);
-     axi_eth_mdio_write(3, MII_BMCR, bmcr);
+     axi_eth_mdio_write(7, MII_BMCR, 0);
+     axi_eth_mdio_write(7, MII_BMCR, bmcr);
      printf("bmcr-2: %x\n", bmcr);
      // Write 1 to 0x09 to restart negotiation
 
@@ -252,29 +252,32 @@ int main(int argc, char* argv[]) {
   EthIndication ethIndication(IfcNames_EthIndicationH2S, IfcNames_EthRequestS2H);
   ethIndication.write(AXIETH_MDIO_CTRL, AXIETH_MDIOCTRL_EN_MASK);
   printf("RD: %x\n", ethIndication.read(AXIETH_MDIO_RD));
-  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
-  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(3, MII_CTRL1000));
-  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(3, MII_STAT1000));
+  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(7, MII_ADVERTISE));
+  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(7, MII_CTRL1000));
+  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(7, MII_STAT1000));
 
   printf("doing the thing here\n");
   //mac_address mac;
   ethIndication.axi_eth_init();
 
-  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
-  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(3, MII_CTRL1000));
-  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(3, MII_STAT1000));
+  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(7, MII_ADVERTISE));
+  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(7, MII_CTRL1000));
+  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(7, MII_STAT1000));
 
   printf("finished setting the flags and stuff\n");
 
   uint8_t mac[6] = {0x0a, 0xbc, 0x3b, 0x82, 0x91, 0x14};
 
-  //for (int i = 0; i < 100; i++) {
-  //  ethIndication.sendHelloWorldPacket(mac);
-  //}  
+  sleep(5);
+
+  for (int i = 0; i < 100; i++) {
+    ethIndication.sendHelloWorldPacket(mac);
+    //sleep(1);
+  }  
 
  
-  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
-  ethIndication.sendHelloWorldPacket(mac);
+  //printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(7, MII_ADVERTISE));
+  //ethIndication.sendHelloWorldPacket(mac);
   //ethIndication.write(AXIETH_TDL, uint32_t(0xdeadbeef));
  
 
