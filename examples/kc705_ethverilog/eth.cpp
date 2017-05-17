@@ -43,8 +43,8 @@ class EthIndication: public EthIndicationWrapper {
     // Indication call back methods
     void response(int write, uint32_t data) {
       //`printf("Got back: %x, %x\n", write, data);
-      sem_post(&sem); 
       this->data = data;
+      sem_post(&sem);
     }
 
     void reset() {
@@ -82,7 +82,99 @@ class EthIndication: public EthIndicationWrapper {
    }
 
    void axi_eth_init() {
-   
+     // Disable interrupts 
+     printf("MDIO: %x\n", read(AXIETH_MDIO_CTRL));     
+     write(AXIETH_MDIO_CTRL, AXIETH_MDIOCTRL_EN_MASK);
+     printf("MDIO (after en): %x\n", read(AXIETH_MDIO_CTRL));
+
+
+     printf("Disabling 1000BASE_T\n");
+     //  Dont advertise 1000BASE_T Full/Half duplex speeds
+     if (axi_eth_mdio_write(3, MII_CTRL1000, 0) < 0) {
+       printf("Failed writing miictrl100\n");
+     }
+
+     printf("Advertising 10/100\n");
+     //  Advertise only 10 and 100mbps full/half duplex speeds
+     if (axi_eth_mdio_write(3, MII_ADVERTISE, ADVERTISE_ALL | ADVERTISE_CSMA) < 0) {
+       printf("Failed to advertise\n");
+     }
+  
+     printf("Restarting auto negotiation\n");
+
+     // Restart auto negotiation
+     uint32_t bmcr = axi_eth_mdio_read(3, MII_BMCR);
+     printf("bmcr: %x\n", bmcr);
+     bmcr |= (BMCR_ANENABLE | BMCR_ANRESTART);
+     axi_eth_mdio_write(3, MII_BMCR, 0);
+     axi_eth_mdio_write(3, MII_BMCR, bmcr);
+     printf("bmcr-2: %x\n", bmcr);
+     // Write 1 to 0x09 to restart negotiation
+
+  }
+
+
+   //
+   // MDIO functions
+   //
+   int axi_eth_mdio_wait() {
+    int timeout = 5000000;
+    while (read(AXIETH_MDIO_CTRL) & AXIETH_MDIOCTRL_STATUS_MASK) {
+      printf("looping... mdio\n");
+      if (timeout-- < 0) {
+        printf("Timeout exceeded\n");
+        return -1;
+      }
+    }
+
+    return 0;
+   }   
+
+   int axi_eth_mdio_read(int phy_id, int reg) {
+    if (axi_eth_mdio_wait()) {
+      // Err
+      printf("FAILED READ\n");
+      return -1;  
+    }
+
+    /* Write the PHY address, register number and set hte OP bit in the
+     * MDIO address register. Set the Status bit in the MDIO Control
+     * register to start a MDIO read transaction
+     */ 
+    uint32_t ctrl_reg = read(AXIETH_MDIO_CTRL);
+    write(AXIETH_MDIO_ADDR, AXIETH_MDIO_OP_MASK | ((phy_id << AXIETH_MDIO_PHYADDR_SHIFT) | reg));
+    write(AXIETH_MDIO_CTRL, ctrl_reg | AXIETH_MDIOCTRL_STATUS_MASK);
+
+    if (axi_eth_mdio_wait()) {
+      printf("ALSO FAILED READ\n");
+      return -1;
+    }
+
+    uint32_t rdata = read(AXIETH_MDIO_RD);
+    return rdata;
+   }
+
+
+   int axi_eth_mdio_write(int phy_id, int reg, uint16_t val) {
+    if (axi_eth_mdio_wait()) {
+      printf("Failed MDIO write wait\n");
+      return -1;
+    }    
+
+    uint32_t ctrl_reg = read(AXIETH_MDIO_CTRL);
+    printf("WRITE: ctrl_reg: %x\n", ctrl_reg);
+    printf("WRITE: writing %x\n", ((phy_id << AXIETH_MDIO_PHYADDR_SHIFT) | reg));  
+    printf("WRITE: op mask %x\n", ~AXIETH_MDIO_OP_MASK);
+    write(AXIETH_MDIO_ADDR, (~AXIETH_MDIO_OP_MASK) & ((phy_id << AXIETH_MDIO_PHYADDR_SHIFT) | reg));
+    printf("WRITE: mdioaddr: %x\n", read(AXIETH_MDIO_WR));
+    printf("WRITE: attempted mdiowr: %x\n", val);
+    write(AXIETH_MDIO_WR, val);
+    printf("WRITE: mdiowr: %x\n", read(AXIETH_MDIO_WR));
+    printf("WRITE: reading you twice mdiowr: %x\n", read(AXIETH_MDIO_WR));
+    printf("WRITE: setting crl %x\n", ctrl_reg | AXIETH_MDIOCTRL_STATUS_MASK);
+    write(AXIETH_MDIO_CTRL, ctrl_reg | AXIETH_MDIOCTRL_STATUS_MASK);
+    printf("WRITE: ctrl_reg: %x\n", read(AXIETH_MDIO_CTRL));
+    return 0; 
    }
 
 
@@ -158,17 +250,31 @@ class EthIndication: public EthIndicationWrapper {
 int main(int argc, char* argv[]) {
   // Eth eth = new Eth();
   EthIndication ethIndication(IfcNames_EthIndicationH2S, IfcNames_EthRequestS2H);
+  ethIndication.write(AXIETH_MDIO_CTRL, AXIETH_MDIOCTRL_EN_MASK);
+  printf("RD: %x\n", ethIndication.read(AXIETH_MDIO_RD));
+  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
+  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(3, MII_CTRL1000));
+  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(3, MII_STAT1000));
+
   printf("doing the thing here\n");
   //mac_address mac;
+  ethIndication.axi_eth_init();
+
+  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
+  printf("CTRL: %x\n", ethIndication.axi_eth_mdio_read(3, MII_CTRL1000));
+  printf("STAT: %x\n", ethIndication.axi_eth_mdio_read(3, MII_STAT1000));
+
+  printf("finished setting the flags and stuff\n");
+
   uint8_t mac[6] = {0x0a, 0xbc, 0x3b, 0x82, 0x91, 0x14};
 
-  for (int i = 0; i < 100; i++) {
-    ethIndication.sendHelloWorldPacket(mac);
-  }  
+  //for (int i = 0; i < 100; i++) {
+  //  ethIndication.sendHelloWorldPacket(mac);
+  //}  
 
  
-
-  //ethIndication.sendHelloWorldPacket(mac);
+  printf("ADVERTISE: %x\n", ethIndication.axi_eth_mdio_read(3, MII_ADVERTISE));
+  ethIndication.sendHelloWorldPacket(mac);
   //ethIndication.write(AXIETH_TDL, uint32_t(0xdeadbeef));
  
 
@@ -176,19 +282,4 @@ int main(int argc, char* argv[]) {
   //  printf("Reading #%d: %x\n", i, ethIndication.read(AXIETH_TCL));
   //}
  
-  //ethIndication.sendHelloWorldPacket(mac);
-  //uint32_t data = ethIndication.read(AXIETH_TDL);
-  //printf("This is : %x\n", data);
-  //ethIndication.readPacket();
-  
-  //printf("Sent the first packet\n");
-  //ethIndication.sendHelloWorldPacket(mac);
-  //printf("Sent the second packet\n");
-
-  //ethIndication.sendHelloWorldPacket(mac);
-  //printf("Sent the third packet\n");
-
-  
-//  ethIndication.write(32, 100);
-//  ethIndication.read(32);
 }

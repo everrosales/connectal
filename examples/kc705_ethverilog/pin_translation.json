@@ -62,5 +62,13 @@
     "phy_rst_n": {
         "PIO_DIRECTION": "OUTPUT",
         "ethernet": "reset_b"
-    }
+    },
+    "phy_mdc": {
+        "PIO_DIRECTION": "OUTPUT",
+        "ethernet": "mdc"
+    },
+    "mdio_mdio": {
+        "PIO_DIRECTION": "BIDIR",
+        "ethernet": "mdio"
+   }
 }

@@ -4,6 +4,7 @@
 // the axi interface
 import FIFO::*;
 import FIFOF::*;
+import TriState::*;
 import AxiEthLite::*;
 
 
@@ -33,9 +34,18 @@ typedef struct {
 
 } ReadDataChan deriving(Bits, Eq);
   
+
+interface MDIOPins;
+  method Inout#(Bit#(1)) mdio;
+endinterface
+
+
 interface EthMasterPins;
   (* prefix = "phy" *)
   interface AxiethlitePhy pins;
+
+  (* prefix = "mdio" *)
+  interface MDIOPins mdio_pins;
   interface Clock deleteme_unused_clock;
   
 endinterface
@@ -56,6 +66,9 @@ module mkEthMaster(EthMaster);
 
   Reg#(Bit#(1)) intc <- mkReg(0);
 
+  TriState#(Bit#(1)) mdio <- mkTriState(ethLite.mdio.mdio_t == 0, ethLite.mdio.mdio_o);
+
+
   // Make a dwire that does a thing
   Wire#(Bit#(13)) araddr <- mkDWire(0);
   Wire#(Bit#(1)) arvalid <- mkDWire(0);
@@ -66,6 +79,8 @@ module mkEthMaster(EthMaster);
   Wire#(Bit#(32)) wdata  <- mkDWire(0);
   Wire#(Bit#(4)) wstrb   <- mkDWire(0);
   Wire#(Bit#(1)) wvalid  <- mkDWire(0);
+  Wire#(Bit#(1)) mdio_i  <- mkDWire(0);
+
   // Add book keeping fifo
   // Check if the read
   FIFO#(Bool) bookkeeperWasWrite <- mkFIFO;
@@ -88,6 +103,7 @@ module mkEthMaster(EthMaster);
     ethLite.s_axi.wdata(wdata);
     ethLite.s_axi.wstrb(wstrb);
     ethLite.s_axi.wvalid(wvalid);
+    ethLite.mdio.mdio_i(mdio._read);
   endrule
 
   rule readInt;
@@ -202,5 +218,10 @@ module mkEthMaster(EthMaster);
   interface EthMasterPins pins;
     interface AxiethlitePhy pins = ethLite.phy;
     interface Clock deleteme_unused_clock = clock;
+    interface MDIOPins mdio_pins;
+      method Inout#(Bit#(1)) mdio;
+        return mdio.io;
+      endmethod
+    endinterface
   endinterface
 endmodule

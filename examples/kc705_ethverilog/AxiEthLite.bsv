@@ -37,6 +37,7 @@ interface AxiethlitePhy;
     method Action      tx_clk(Bit#(1) v);
     method Bit#(4)     tx_data();
     method Bit#(1)     tx_en();
+    method Bit#(1)     mdc();
 endinterface
 (* always_ready, always_enabled *)
 interface AxiethliteS_axi;
@@ -59,10 +60,18 @@ interface AxiethliteS_axi;
     method Action      wvalid(Bit#(1) v);
 endinterface
 (* always_ready, always_enabled *)
+interface AxiethliteMDIO;
+    method Action      mdio_i(Bit#(1) v);
+    method Bit#(1)     mdio_o();
+    method Bit#(1)     mdio_t();
+endinterface
+
+(* always_ready, always_enabled *)
 interface AxiEthLite;
     interface AxiethliteIp     ip2;
-    interface AxiethlitePhy     phy;
-    interface AxiethliteS_axi     s_axi;
+    interface AxiethlitePhy    phy;
+    interface AxiethliteS_axi  s_axi;
+    interface AxiethliteMDIO   mdio;
 endinterface
 import "BVI" ethernetlite =
 module mkAxiEthLite (AxiEthLite);
@@ -86,6 +95,7 @@ module mkAxiEthLite (AxiEthLite);
         method rx_data(phy_rx_data) enable((*inhigh*) EN_phy_rx_data);
         method rx_er(phy_rx_er) enable((*inhigh*) EN_phy_rx_er);
         method tx_clk(phy_tx_clk) enable((*inhigh*) EN_phy_tx_clk);
+        method phy_mdc mdc();
         method phy_tx_data tx_data();
         method phy_tx_en tx_en();
     endinterface
@@ -108,7 +118,12 @@ module mkAxiEthLite (AxiEthLite);
         method wstrb(s_axi_wstrb) clocked_by (s_axi_aclk) enable((*inhigh*) EN_s_axi_wstrb);
         method wvalid(s_axi_wvalid) clocked_by (s_axi_aclk) enable((*inhigh*) EN_s_axi_wvalid);
     endinterface
-    schedule (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_data, phy.rx_er, phy.rx_clk, phy.tx_clk, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp) CF (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_clk, phy.tx_clk, phy.rx_data, phy.rx_er, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp);
+    interface AxiethliteMDIO mdio;
+       method mdio_i(phy_mdio_i) enable((*inhigh*) EN_phy_mdio_i);
+       method phy_mdio_o mdio_o();
+       method phy_mdio_t mdio_t();
+    endinterface
+    schedule (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_data, phy.rx_er, phy.rx_clk, phy.tx_clk, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp, mdio.mdio_o, mdio.mdio_i, mdio.mdio_t, phy.mdc) CF (phy.col, phy.crs, phy.dv, phy.rst_n, phy.rx_clk, phy.tx_clk, phy.rx_data, phy.rx_er, phy.tx_data, phy.tx_en, s_axi.araddr, s_axi.arready, s_axi.arvalid, s_axi.awaddr, s_axi.awready, s_axi.awvalid, s_axi.bready, s_axi.bresp, s_axi.bvalid, s_axi.rdata, s_axi.rready, s_axi.rresp, s_axi.rvalid, s_axi.wdata, s_axi.wready, s_axi.wstrb, s_axi.wvalid, ip2.intp, mdio.mdio_o, mdio.mdio_i, mdio.mdio_t, phy.mdc);
 endmodule
 
 /*
