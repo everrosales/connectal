@@ -113,7 +113,8 @@ class EthIndication: public EthIndicationWrapper {
      if (axi_eth_mdio_wait() < 0)
        printf("[WARN]: MDIO write timeout\n");
 
-
+     write(AXIETH_TCTL, 0);
+     write(AXIETH_RCTL, 0);
      // TODO: Wait until renegotiation has completed
   }
 
@@ -255,7 +256,7 @@ class EthIndication: public EthIndicationWrapper {
     // spin until you recieve something
     uint32_t present = 0;
     while (!present) {
-      present = read(AXIETH_RCTL);
+      present = read(AXIETH_RCTL) & 0x01;
     }
     
     // Copy over bytes 0 - 1512
@@ -302,20 +303,7 @@ class EthIndication: public EthIndicationWrapper {
       pkt->data[i + starting_offset + 2] = tmp_data_arr[2];
       pkt->data[i + starting_offset + 3] = tmp_data_arr[3];
     }
-    /*
-    uint32_t *ptr = (uint32_t *) pkt;
-    for (int i = 0; i < ((AXIETH_RX_PKT_LEN + 16 )/ 8); i++) {
-      ptr[i] = read(0x1000 + (4*i));
-    }
-    // Getting the last index of the partial word you need to read
-    uint32_t index = ((AXIETH_RX_PKT_LEN + 16) / 8) * 8;
-    // copy over the remainder 2 bytes
-    uint32_t data = read(0x1000 + (4*index));
-    uint8_t *remainder = (uint8_t *) &data;
-    for (int i = 0; i < (AXIETH_RX_PKT_LEN % 8); i++) {
-      ptr[index + i] = remainder[i];
-    }
-    */
+    
     // Set the rx status bit back to 0 so that you can continue reading
     write(AXIETH_RCTL, 0);
    }
