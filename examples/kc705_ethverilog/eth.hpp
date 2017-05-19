@@ -1,5 +1,6 @@
 #ifndef ETH_H
 #define ETH_H
+#include "axiethlite.hpp"
 #include <semaphore.h>
 #include <pthread.h>
 
@@ -9,10 +10,13 @@ class EthIndication;
  class Eth {
    public:
      Eth();
-//     ~Eth();
+     ~Eth();
      void reset();
      void read(unsigned long offset, uint8_t *buf);
      void write(unsigned long offset, const uint8_t *buf);
+     void axi_eth_init(int phy_id);
+     void send_packet(tx_packet *pkt, int len);
+     void receive_packet(rx_packet *pkt);
 //
    private:
      EthRequestProxy ethRequest;

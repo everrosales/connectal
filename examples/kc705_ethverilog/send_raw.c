@@ -15,12 +15,12 @@
 #include <net/if.h>
 #include <netinet/ether.h>
 
-#define MY_DEST_MAC0  0xFF
-#define MY_DEST_MAC1  0xFF
-#define MY_DEST_MAC2  0xFF
-#define MY_DEST_MAC3  0xFF
-#define MY_DEST_MAC4  0xFF
-#define MY_DEST_MAC5  0xFF
+#define MY_DEST_MAC0  0x00
+#define MY_DEST_MAC1  0x00
+#define MY_DEST_MAC2  0x5E
+#define MY_DEST_MAC3  0x00
+#define MY_DEST_MAC4  0xFA
+#define MY_DEST_MAC5  0xCE
 
 #define DEFAULT_IF  "eth1"
 #define BUF_SIZ   1024

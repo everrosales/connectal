@@ -101,7 +101,10 @@ struct tx_packet {
 } __attribute__ ((packed));
 
 struct rx_packet {
-  uint8_t buf[AXIETH_RX_PKT_LEN];
+  uint8_t dst_mac_addr[6];
+  uint8_t src_mac_addr[6];
+  uint16_t type_length;
+  uint8_t data[AXIETH_RX_PKT_LEN];
 } __attribute__ ((packed));
 
 #endif
