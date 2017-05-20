@@ -21,6 +21,8 @@
 #define AXIETH_RCTL_IE     0x0000008  // RX interrupt enable
 #define AXIETH_RCTL_STATUS 0x0000001  // RX status
 
+#define AXIETH_RCTL_PONG   0x0001FFC  // RX Pong control register
+
 #define AXIETH_RX_PKT_LEN       1500  // RX Packet length
 
 #define AXIETH_MAC_ADDR_LEN        6  // MAC address length

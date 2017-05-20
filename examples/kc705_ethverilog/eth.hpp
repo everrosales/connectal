@@ -21,6 +21,8 @@ class EthIndication;
    private:
      EthRequestProxy ethRequest;
 //     EthIndication *indication;
+     void receive_packet_from_pong(rx_packet *pkt);
+     void receive_packet_from_ping(rx_packet *pkt);
      sem_t sem;
      uint32_t data;
      pthread_mutex_t mu;  

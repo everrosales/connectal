@@ -2,7 +2,7 @@
 CONNECTALDIR?=../..
 
 BSVFILES = EthTest.bsv
-CPPFILES = eth.cpp, raw_echo.cpp
+CPPFILES = eth.cpp
 
 S2H_INTERFACES = EthRequest:EthTest.ethRequest
 H2S_INTERFACES = EthTest:EthIndication

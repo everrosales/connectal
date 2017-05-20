@@ -12,6 +12,7 @@ class EthIndication: public EthIndicationWrapper {
     sem_t sem;
     uint32_t data;
     pthread_mutex_t mu;
+    bool rx_is_ping;
 
   public:
     EthIndication (unsigned int indicationId, unsigned int requestId)
@@ -20,6 +21,7 @@ class EthIndication: public EthIndicationWrapper {
     {
         sem_init(&sem, 1, 0);
         pthread_mutex_init(&mu, 0);
+        rx_is_ping = true;
     }
 
     // Request wrappers
@@ -187,10 +189,8 @@ class EthIndication: public EthIndicationWrapper {
      // 4) Write data
        
      // NOTE: len is the length of the data
- 
      // First copy over the dst / src mac addresses
         
-
      bool sending=true;
      while(sending) {
        uint32_t txctrl = read(AXIETH_TCTL);
@@ -248,16 +248,82 @@ class EthIndication: public EthIndicationWrapper {
     
    }
 
-   void receive_packet(rx_packet *pkt) {
+  void receive_packet_from_pong(rx_packet *pkt) {
     // TODO: fill rx_packet with receive data
     // Read the status bit until its set
     // Read the data, clear it
      
     // spin until you recieve something
+    printf("Waiting until recieved packet\n");
+    uint32_t present = 0;
+    while (!present) {
+      present = read(AXIETH_RCTL_PONG) & AXIETH_RCTL_STATUS;
+    }
+    printf("Made it past this loop\n");
+    
+    // Copy over bytes 0 - 1512
+    uint32_t macs[3];
+    macs[0] = read(0x1800);
+    macs[1] = read(0x1804);
+    macs[2] = read(0x1808);
+
+    uint8_t *byte_macs = (uint8_t *) macs;  
+  
+    for (int i=0; i < 6; i++) {
+      pkt->dst_mac_addr[i] = byte_macs[i];
+      pkt->src_mac_addr[i] = byte_macs[6+i];  
+    }
+    if (verbose) {
+      printf("pkt->dst_mac_addr: %x:%x:%x:%x:%x:%x\n", 
+             pkt->dst_mac_addr[0], pkt->dst_mac_addr[1],
+             pkt->dst_mac_addr[2], pkt->dst_mac_addr[3],
+             pkt->dst_mac_addr[4], pkt->dst_mac_addr[5]);
+      printf("pkt->src_mac_addr: %x:%x:%x:%x:%x:%x\n",
+             pkt->src_mac_addr[0], pkt->src_mac_addr[1],
+             pkt->src_mac_addr[2], pkt->src_mac_addr[3],
+             pkt->src_mac_addr[4], pkt->src_mac_addr[5]);
+    }
+    uint32_t size_and_data = read(0x180C);
+    pkt->type_length = ((uint16_t *) &size_and_data)[0];
+    
+    if (verbose)
+      printf("pkt->type_length: %d\n", pkt->type_length);
+ 
+    if (AXIETH_RX_PKT_LEN < 2) 
+      printf("AXIETH_RX_PKT_LEN must be > 2\n");
+
+
+    printf("Beginning data read\n");
+    pkt->data[0] = ((uint8_t *) &size_and_data)[3];
+    pkt->data[1] = ((uint8_t *) &size_and_data)[4];
+
+
+    int starting_offset = 2;
+    for (int i = 0; i < (AXIETH_RX_PKT_LEN - starting_offset); i = i + 4) {
+      uint32_t tmp_data = read(0x1810 + i);
+      uint8_t *tmp_data_arr = (uint8_t *) &tmp_data;
+      pkt->data[i + starting_offset] = tmp_data_arr[0];
+      pkt->data[i + starting_offset + 1] = tmp_data_arr[1];
+      pkt->data[i + starting_offset + 2] = tmp_data_arr[2];
+      pkt->data[i + starting_offset + 3] = tmp_data_arr[3];
+    }
+    
+    // Set the rx status bit back to 0 so that you can continue reading
+    write(AXIETH_RCTL_PONG, 0);
+   }
+
+ void receive_packet_from_ping(rx_packet *pkt) {
+    // TODO: fill rx_packet with receive data
+    // Read the status bit until its set
+    // Read the data, clear it
+     
+    // spin until you recieve something
+    printf("Waiting until recieved packet\n");
     uint32_t present = 0;
     while (!present) {
       present = read(AXIETH_RCTL) & 0x01;
     }
+    printf("Made it past this loop\n");
     
     // Copy over bytes 0 - 1512
     uint32_t macs[3];
@@ -290,6 +356,8 @@ class EthIndication: public EthIndicationWrapper {
     if (AXIETH_RX_PKT_LEN < 2) 
       printf("AXIETH_RX_PKT_LEN must be > 2\n");
 
+
+    printf("Beginning data read\n");
     pkt->data[0] = ((uint8_t *) &size_and_data)[3];
     pkt->data[1] = ((uint8_t *) &size_and_data)[4];
 
@@ -307,6 +375,16 @@ class EthIndication: public EthIndicationWrapper {
     // Set the rx status bit back to 0 so that you can continue reading
     write(AXIETH_RCTL, 0);
    }
+
+  void receive_packet(rx_packet *pkt) {
+    if (rx_is_ping) {
+      receive_packet_from_ping(pkt);
+    } else {
+      receive_packet_from_pong(pkt);
+    }
+    rx_is_ping = !rx_is_ping;
+  }  
+  
 };
 
 

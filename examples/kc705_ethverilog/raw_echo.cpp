@@ -22,9 +22,9 @@ int raw_echo(EthIndication *ethIndication) {
       tx.src_mac_addr[j] = rx.dst_mac_addr[j];
     }
     tx.type_length = rx.type_length;
+    int length = tx.type_length;
     if (tx.type_length > 1516) {
-      printf("Dropping message thats too long\n"); 
-      continue;
+      length = 1500;
     }
     for (int j = 0; j < tx.type_length; j++) {
       tx.data[j] = rx.data[j];
@@ -41,12 +41,13 @@ int raw_echo(EthIndication *ethIndication) {
      printf("  tx->dst: %x:%x:%x:%x:%x:%x\n",
          tx.dst_mac_addr[0], tx.dst_mac_addr[1],
          tx.dst_mac_addr[2], tx.dst_mac_addr[3],
-         tx.dst_mac_addr[3], tx.dst_mac_addr[5]);    
+         tx.dst_mac_addr[3], tx.dst_mac_addr[5]);   
+     printf("length: %d\n", length); 
     }
 
 
     printf("Recieved packet\n");
-    ethIndication->send_packet(&tx, tx.type_length);
+    ethIndication->send_packet(&tx, length);
     printf("Echoed packet: len %d\n", tx.type_length);
     i--;
   }
