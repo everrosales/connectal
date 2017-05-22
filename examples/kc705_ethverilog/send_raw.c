@@ -1,10 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- */
-
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
 #include <stdio.h>
@@ -79,13 +72,15 @@ int main(int argc, char *argv[])
   tx_len += sizeof(struct ether_header);
 
   /* Packet data */
-  sendbuf[tx_len++] = 0x2A;
-  sendbuf[tx_len++] = 0x00;
-  sendbuf[tx_len++] = 0x00;
-  sendbuf[tx_len++] = 0xde;
-  sendbuf[tx_len++] = 0xad;
-  sendbuf[tx_len++] = 0xbe;
-  sendbuf[tx_len++] = 0xef;
+  char data = {0x2A, 0x00, 0xde, 0xad, 0xbe, 0xef }
+  int data_len = 0
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
+  sendbuf[tx_len++] = data[data_len++];
   tx_len = 0x2A;
 
   /* Index of the network device */
